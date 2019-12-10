@@ -1,0 +1,99 @@
+function execute() {
+    let toys = ['barbie', 'elsa', 'princess', 'cars'];
+    let quotes = ['barbie is cool', 'elsa is awesome with barbie', 'princess princess princess goes with elsa and barbie'];
+    return fetchTopNToys(4, 2, toys, quotes);
+}
+
+function fetchTopNToys(numOfToys, topNumToys, toys, quotes) {
+  this.toyHashTable = new Map();
+  let priorityQ = new PriorityQ();
+
+  if (numOfToys > 0 && toys.length > 0) {
+    toys.map(toy => toyHashTable.set(toy, 0));
+
+    if (quotes.length > 0) {
+      quotes.map(updateToyTableWithPriority);
+    }
+    toys.map(addItemsToPQ);
+  }
+  return priorityQ;
+
+  //utility function to parse quotes
+  function updateToyTableWithPriority(quote) {
+    const words = quote.split(" ");
+
+    for (let index = 0; index < words.length; index++) {
+
+      if(this.toyHashTable.get(words[index]) >= 0) {
+        let matchCounter = toyHashTable.get(words[index]);
+        this.toyHashTable.set(words[index], ++matchCounter);
+      }
+    }
+  }
+  //utility function to insert toys to PQ
+  function addItemsToPQ(toyInContext) {
+    let toyItem = new ToyItemWithPriority(toyInContext, this.toyHashTable.get(toyInContext));
+    priorityQ.addItem(toyItem);
+  }
+}
+
+// Binary Heap Implementation
+function comparatorFunction(a, b) {
+  return a.priority - b.priority;
+}
+
+function PriorityQ() {
+  this.heapContainer = [];
+  this.compare = comparatorFunction;
+}
+
+function ToyItemWithPriority (toy, priority) {
+  return Object.freeze({ toy, priority });
+}
+
+PriorityQ.prototype.getParent = function(index) {
+  return this.heapContainer[Math.floor((index - 1) / 2)];
+};
+
+PriorityQ.prototype.hasLeftChild = function(index) {
+  return (2*index + 1) < this.heapContainer.length;
+};
+
+PriorityQ.prototype.hasRightChild = function(index) {
+  return (2*index + 2) < this.heapContainer.length;
+};
+
+PriorityQ.prototype.getLeftChild = function(index) {
+  return this.heapContainer[2*index + 1];
+};
+
+PriorityQ.prototype.getRightChild = function(index) {
+  return this.heapContainer[2*index + 2];
+};
+
+PriorityQ.prototype.swap = function(sourceIndex, targetIndex) {
+  let temp = this.heapContainer[targetIndex];
+  this.heapContainer[targetIndex] = this.heapContainer[sourceIndex];
+  this.heapContainer[sourceIndex] = temp;
+};
+
+PriorityQ.prototype.percolateUp = function() {
+  let index = this.heapContainer.length - 1;
+  //item priority is greater than parent priority 
+  if(this.getParent(index) != null 
+      && this.compare(this.heapContainer[index], this.getParent(index)) >= 0) {
+    this.swap(index, Math.floor((index - 1) / 2));
+  }
+};
+
+PriorityQ.prototype.addItem = function(item) {
+  if(this.heapContainer.length > 0) {
+    this.heapContainer.push(item);
+    this.percolateUp();
+  } else {
+    this.heapContainer.push(item);
+  }
+};
+
+
+execute();
